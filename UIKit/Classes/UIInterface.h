@@ -29,6 +29,8 @@
 
 #import "UIColor.h"
 #import "UIFont.h"
+#import <CoreGraphics/CoreGraphics.h>  // CGColorRef
+
 
 
 typedef NS_ENUM(NSInteger, UIBarStyle) {

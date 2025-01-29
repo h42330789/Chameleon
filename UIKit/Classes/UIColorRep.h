@@ -28,6 +28,8 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>  // CGColorRef
+
 
 @class UIImageRep;
 

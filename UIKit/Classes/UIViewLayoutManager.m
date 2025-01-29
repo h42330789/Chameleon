@@ -49,7 +49,19 @@ static UIViewLayoutManager *theLayoutManager = nil;
 
 - (void)layoutSublayersOfLayer:(CALayer *)theLayer
 {
-    [[theLayer delegate] _layoutSubviews];
+//    [[theLayer delegate] _layoutSubviews];
+    if ([theLayer.delegate respondsToSelector:@selector(layoutSublayersOfLayer:)]) {
+        [[theLayer delegate] layoutSublayersOfLayer:theLayer];
+    }
+    /**
+    在 CALayerDelegate 中，_layoutSubviews 方法已经被弃用，并且替换为 layoutSublayersOfLayer: 方法。这个变化是为了让 CALayerDelegate 变得更加灵活，遵循现代的层次化布局和渲染机制。
+
+    1. 旧方法 (已弃用)
+    在 iOS 13 之前，CALayerDelegate 可能使用了 _layoutSubviews 方法，来手动更新和布局子视图。然而，随着 iOS 13 及更高版本的更新，Apple 强烈推荐使用新的方法来替代。
+
+    2. 新方法：layoutSublayersOfLayer:
+    从 iOS 13 开始，CALayerDelegate 提供了 layoutSublayersOfLayer: 方法来替代 _layoutSubviews。这个方法在 CALayer 需要布局其子层（sub-layers）时被调用。
+     */
 }
 
 @end

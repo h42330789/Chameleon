@@ -28,6 +28,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <ImageIO/ImageIO.h>
 
 @interface UIImageRep : NSObject
 

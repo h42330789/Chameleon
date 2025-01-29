@@ -131,10 +131,19 @@ static NSArray *CGImagesWithUIImages(NSArray *images)
         [self setNeedsDisplay];
     }
 }
+/**
+1. displayLayer: 方法的弃用
+UIImageView 的 displayLayer: 方法在早期版本的 iOS 中是用于在 UIImageView 的 CALayer 上进行自定义绘制，但在 iOS 13 后，Apple 推荐使用 drawLayer:inContext: 方法，或其他绘制方法来代替 displayLayer:。
 
+2. 新的替代方法：drawRect: 或 drawLayer:inContext:
+虽然 displayLayer: 被弃用，但如果你需要在 UIImageView 上进行自定义绘制操作，可以考虑以下方法：
+
+1. 使用 drawRect:（对于 UIView 子类）
+如果你需要对 UIImageView 进行自定义绘制，可以通过继承 UIImageView 并重写其 drawRect: 方法。drawRect: 方法用于在视图的内容区域进行自定义绘制。
+ */
 - (void)displayLayer:(CALayer *)theLayer
 {
-    [super displayLayer:theLayer];
+//    [super displayLayer:theLayer];
     
     UIImage *displayImage = (_highlighted && _highlightedImage)? _highlightedImage : _image;
     const CGFloat scale = self.window.screen.scale;
