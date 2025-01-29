@@ -28,6 +28,7 @@
  */
 
 #import "ChameleonAppDelegate.h"
+#import "TestVC.h"
 
 @implementation ChameleonAppDelegate
 
@@ -36,6 +37,8 @@
     window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
     window.backgroundColor = [UIColor whiteColor];
     window.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    TestVC *vc = [[TestVC alloc] init];
+    window.rootViewController = [[UINavigationController alloc] initWithRootViewController:vc];
 
     
     appleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"apple.png"]];
