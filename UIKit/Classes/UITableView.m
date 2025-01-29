@@ -54,6 +54,8 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     NSMutableSet *_reusableCells;
     NSMutableArray *_sections;
     
+    NSMutableDictionary *_registeredClasses;
+    
     struct {
         unsigned heightForRowAtIndexPath : 1;
         unsigned heightForHeaderInSection : 1;
@@ -90,6 +92,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
         _cachedCells = [[NSMutableDictionary alloc] init];
         _sections = [[NSMutableArray alloc] init];
         _reusableCells = [[NSMutableSet alloc] init];
+        _registeredClasses = [[NSMutableDictionary alloc] init];
 
         self.separatorColor = [UIColor colorWithRed:.88f green:.88f blue:.88f alpha:1];
         self.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
@@ -714,6 +717,16 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
 {
     [self _scrollRectToVisible:[self rectForRowAtIndexPath:indexPath] atScrollPosition:scrollPosition animated:animated];
 }
+// 模拟 register 方法
+- (void)registerClass:(Class)cellClass{
+    NSString *className = NSStringFromClass(cellClass);
+    [self registerClass:cellClass forCellReuseIdentifier:className];
+}
+- (void)registerClass:(Class)cellClass forCellReuseIdentifier:(NSString *)identifier {
+    if (cellClass && identifier) {
+        _registeredClasses[identifier] = cellClass;
+    }
+}
 
 - (UITableViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier
 {
@@ -732,6 +745,39 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     }
     
     return nil;
+}
+
+// 模拟 dequeueReusableCellWithIdentifier 方法
+- (UITableViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath {
+    if (!identifier) {
+        return nil;
+    }
+    
+    // 从复用池中获取
+    UITableViewCell *reusableCell = [self dequeueReusableCellWithIdentifier:identifier];
+    if (!reusableCell) {
+        // 如果没有复用单元格，则创建一个新的
+        Class cellClass = _registeredClasses[identifier];
+        if (cellClass) {
+            reusableCell = [[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        }
+    }
+    return reusableCell;
+}
+- (UITableViewCell *)dequeueReusableCellClass:(Class)cellClass forIndexPath:(NSIndexPath *)indexPath {
+    NSString *identifier = NSStringFromClass(cellClass);
+    if (!identifier) {
+        return nil;
+    }
+    
+    // 从复用池中获取
+    UITableViewCell *reusableCell = [self dequeueReusableCellWithIdentifier:identifier];
+    if (!reusableCell) {
+        if (cellClass) {
+            reusableCell = [[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        }
+    }
+    return reusableCell;
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animate

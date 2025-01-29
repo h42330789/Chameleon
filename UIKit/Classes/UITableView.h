@@ -100,7 +100,13 @@ typedef NS_ENUM(NSInteger, UITableViewRowAnimation) {
 - (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell;
 - (NSArray *)indexPathsForVisibleRows;
 - (NSArray *)visibleCells;
+// 注册单元格类
+- (void)registerClass:(Class)cellClass forCellReuseIdentifier:(NSString *)identifier;
+- (void)registerClass:(Class)cellClass;
+// 获取复用的单元格
+- (UITableViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath;
 - (UITableViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier;
+- (UITableViewCell *)dequeueReusableCellClass:(Class)cellClass forIndexPath:(NSIndexPath *)indexPath;
 - (UITableViewCell *)cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 - (CGRect)rectForSection:(NSInteger)section;
