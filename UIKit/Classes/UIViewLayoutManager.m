@@ -50,11 +50,10 @@ static UIViewLayoutManager *theLayoutManager = nil;
 - (void)layoutSublayersOfLayer:(CALayer *)theLayer
 {
 //    [[theLayer delegate] _layoutSubviews];
-    if ([theLayer.delegate respondsToSelector:@selector(layoutSublayersOfLayer:)]) {
-        [[theLayer delegate] layoutSublayersOfLayer:theLayer];
-    }
     if ([theLayer.delegate respondsToSelector:@selector(_layoutSubviews)]) {
         [[theLayer delegate] performSelector:@selector(_layoutSubviews)];
+    } else if ([theLayer.delegate respondsToSelector:@selector(layoutSublayersOfLayer:)]) {
+        [[theLayer delegate] layoutSublayersOfLayer:theLayer];
     }
     /**
     在 CALayerDelegate 中，_layoutSubviews 方法已经被弃用，并且替换为 layoutSublayersOfLayer: 方法。这个变化是为了让 CALayerDelegate 变得更加灵活，遵循现代的层次化布局和渲染机制。
