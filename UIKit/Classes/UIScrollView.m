@@ -268,12 +268,13 @@ const float UIScrollViewDecelerationRateFast = 0.99;
     if (!self.alwaysBounceVertical && _contentSize.height <= scrollerBounds.size.height) {
         offset.y = confinedOffset.y;
     }
-    
+    NSLog(@"UIScrollView-_setRestrainedContentOffset");
     self.contentOffset = offset;
 }
 
 - (void)_confineContent
 {
+    NSLog(@"UIScrollView-_confineContent");
     self.contentOffset = [self _confinedContentOffset:_contentOffset];
 }
 
@@ -331,6 +332,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
 
 - (void)setContentOffset:(CGPoint)theOffset animated:(BOOL)animated
 {
+    NSLog(@"UIScrollView-setContentOffset:animated");
     if (animated) {
         UIScrollViewAnimationScroll *animation = nil;
         
@@ -359,6 +361,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
 
 - (void)setContentOffset:(CGPoint)theOffset
 {
+    NSLog(@"UIScrollView-setContentOffset:");
     [self setContentOffset:theOffset animated:NO];
 }
 
@@ -505,6 +508,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
 
 - (void)_dragBy:(CGPoint)delta
 {
+    NSLog(@"UIScrollView-_dragBy");
     if (_dragging) {
         _horizontalScroller.alwaysVisible = YES;
         _verticalScroller.alwaysVisible = YES;
@@ -570,7 +574,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
     // even in paging mode the deceleration and stuff happens like usual and it only snaps to the correct
     // page *after* the usual deceleration is done. I can't decide what might be best, but since we
     // don't use paging mode in Twitterrific at the moment, I'm not suffeciently motivated to worry about it. :)
-    
+    NSLog(@"UIScrollView-_gestureDidChange");
     if (gesture == _panGestureRecognizer) {
         if (_panGestureRecognizer.state == UIGestureRecognizerStateBegan) {
             [self _beginDragging];
@@ -605,6 +609,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
                 
                 if (!CGPointEqualToPoint(offset, _contentOffset)) {
                     [self _beginDragging];
+                    NSLog(@"UIScrollView-_gestureDidChange-CGPointEqualToPoint-false");
                     self.contentOffset = offset;
                     [self _endDraggingWithDecelerationVelocity:CGPointZero];
                 }
@@ -622,6 +627,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
 
 - (void)_UIScroller:(UIScroller *)scroller contentOffsetDidChange:(CGFloat)newOffset
 {
+    NSLog(@"UIScrollView-scroller-contentOffsetDidChange");
     if (scroller == _verticalScroller) {
         [self setContentOffset:CGPointMake(self.contentOffset.x,newOffset) animated:NO];
     } else if (scroller == _horizontalScroller) {
@@ -643,6 +649,7 @@ const float UIScrollViewDecelerationRateFast = 0.99;
 
 - (void)scrollRectToVisible:(CGRect)rect animated:(BOOL)animated
 {
+    NSLog(@"UIScrollView-scrollRectToVisible");
     const CGRect contentRect = CGRectMake(0,0,_contentSize.width, _contentSize.height);
     const CGRect visibleRect = self.bounds;
     CGRect goalRect = CGRectIntersection(rect, contentRect);

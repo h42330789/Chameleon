@@ -254,9 +254,10 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     
     self.contentSize = CGSizeMake(0,height);	
 }
-
+#pragma mark ***布局和展示***
 - (void)_layoutTableView
 {
+    NSLog(@"_layoutTableView");
     // lays out headers and rows that are visible at the time. this should also do cell
     // dequeuing and keep a list of all existing cells that are visible and those
     // that exist but are not visible and are reusable
@@ -264,6 +265,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     
     const CGSize boundsSize = self.bounds.size;
     const CGFloat contentOffset = self.contentOffset.y;
+    // table的可见bounds部分
     const CGRect visibleBounds = CGRectMake(0,contentOffset,boundsSize.width,boundsSize.height);
     CGFloat tableHeight = 0;
     
@@ -280,10 +282,14 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     const NSInteger numberOfSections = [_sections count];
     [_cachedCells removeAllObjects];
     
+    // 配置在可见范围内容的sections和rows
     for (NSInteger section=0; section<numberOfSections; section++) {
+        // 获取section的整体frame
         CGRect sectionRect = [self rectForSection:section];
         tableHeight += sectionRect.size.height;
         if (CGRectIntersectsRect(sectionRect, visibleBounds)) {
+            // 如果当前section的frame与可见bounds有交集，需要展示
+            // 1、设置header、footer的frame
             const CGRect headerRect = [self rectForHeaderInSection:section];
             const CGRect footerRect = [self rectForFooterInSection:section];
             UITableViewSection *sectionRecord = [_sections objectAtIndex:section];
@@ -296,11 +302,15 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
             if (sectionRecord.footerView) {
                 sectionRecord.footerView.frame = footerRect;
             }
-            
+            // 2、配置rows的frame
             for (NSInteger row=0; row<numberOfRows; row++) {
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
+                // 获取row的frame
                 CGRect rowRect = [self rectForRowAtIndexPath:indexPath];
                 if (CGRectIntersectsRect(rowRect,visibleBounds) && rowRect.size.height > 0) {
+                    // 如果row的frame与可见bounds有交集，设置信息
+                    // 如果之前缓存过该indexPath,直接使用，如果没有缓存过，从dataSource里获取
+                    // 设置cell的frame，并添加到TableView上
                     UITableViewCell *cell = [availableCells objectForKey:indexPath] ?: [self.dataSource tableView:self cellForRowAtIndexPath:indexPath];
                     if (cell) {
                         [_cachedCells setObject:cell forKey:indexPath];
@@ -317,6 +327,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
         }
     }
     
+    // 设置不在可见范围内的cell，如果有重用的key则加入到reuse池中，没有的直接移除
     // remove old cells, but save off any that might be reusable
     for (UITableViewCell *cell in [availableCells allValues]) {
         if (cell.reuseIdentifier) {
@@ -337,11 +348,13 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     // on screen as long as possible, but only if they don't get in the way.
     NSArray* allCachedCells = [_cachedCells allValues];
     for (UITableViewCell *cell in _reusableCells) {
+        // 对于所有进入重用池，没有在可见范围池里，又与可见范围有交集的，移除
+        // 与可见范围有交集的cell就应该在可见范围池里，为什么会不在？
         if (CGRectIntersectsRect(cell.frame,visibleBounds) && ![allCachedCells containsObject: cell]) {
             [cell removeFromSuperview];
         }
     }
-    
+    // 设置footer
     if (_tableFooterView) {
         CGRect tableFooterFrame = _tableFooterView.frame;
         tableFooterFrame.origin = CGPointMake(0,tableHeight);
@@ -349,7 +362,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
         _tableFooterView.frame = tableFooterFrame;
     }
 }
-
+#pragma mark - rect
 - (CGRect)_CGRectFromVerticalOffset:(CGFloat)offset height:(CGFloat)height
 {
     return CGRectMake(0,offset,self.bounds.size.width,height);
@@ -369,6 +382,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
 - (CGRect)rectForSection:(NSInteger)section
 {
     [self _updateSectionsCacheIfNeeded];
+    // 获取当前section前面的section的高度之和为y，当前section的高度为heigh，x：0，width:tableHeight
     return [self _CGRectFromVerticalOffset:[self _offsetForSection:section] height:[[_sections objectAtIndex:section] sectionHeight]];
 }
 
@@ -412,7 +426,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     
     return CGRectZero;
 }
-
+#pragma mark - updates
 - (void) beginUpdates
 {
 }
@@ -475,7 +489,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     NSArray *paths = [self indexPathsForRowsInRect:CGRectMake(point.x,point.y,1,1)];
     return ([paths count] > 0)? [paths objectAtIndex:0] : nil;
 }
-
+#pragma mark 获取可见范围的indexPath，布局，获取_cachedCells的keys
 - (NSArray *)indexPathsForVisibleRows
 {
     [self _layoutTableView];
@@ -821,6 +835,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (!_highlightedRow) {
+        NSLog(@"UITableView-touchesEnded-_highlightedRow=false");
         UITouch *touch = [touches anyObject];
         const CGPoint location = [touch locationInView:self];
         
@@ -829,6 +844,7 @@ const CGFloat _UITableViewDefaultRowHeight = 43;
     }
 
     if (_highlightedRow) {
+        NSLog(@"UITableView-touchesEnded-_highlightedRow=treu");
         [self cellForRowAtIndexPath:_highlightedRow].highlighted = NO;
         [self _setUserSelectedRowAtIndexPath:_highlightedRow];
         _highlightedRow = nil;
